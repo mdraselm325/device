@@ -3,7 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const app = express();
 
-// API endpoint to search for devices
 app.get('/api', async (req, res) => {
     const query = req.query.query;
     const searchUrl = `https://www.gsmarena.com/results.php3?sQuickSearch=yes&sName=${encodeURIComponent(query)}`;
@@ -21,7 +20,7 @@ app.get('/api', async (req, res) => {
             results.push({
                 name,
                 url: `https://www.gsmarena.com/${url}`,
-                imageUrl: imageUrl ? `https://www.gsmarena.com/${imageUrl}` : null,
+                imageUrl,
             });
         });
 
@@ -32,7 +31,6 @@ app.get('/api', async (req, res) => {
     }
 });
 
-// API endpoint to fetch detailed device info
 app.get('/info', async (req, res) => {
     const deviceUrl = req.query.url;
 
@@ -52,7 +50,8 @@ app.get('/info', async (req, res) => {
         const chipsetInfo = $('td[data-spec="chipset"]').text() || "Chipset info not available";
         const batteryType = $('td[data-spec="batdescription1"]').text() || "Battery type not available";
         const batteryCapacity = $('span[data-spec="batsize-hl"]').text() || "Battery capacity not available";
-        const imageUrl = $('.specs-photo-main img').attr('src') || "Image not available"; // Get image URL
+
+        const finalBatteryCapacity = batteryCapacity ? `${batteryCapacity} mAh` : "Battery capacity not available";
 
         res.json({
             title,
@@ -66,8 +65,7 @@ app.get('/info', async (req, res) => {
             ramSize,
             chipsetInfo,
             batteryType,
-            batteryCapacity: batteryCapacity ? `${batteryCapacity} mAh` : "Battery capacity not available",
-            imageUrl: imageUrl ? `https://www.gsmarena.com/${imageUrl}` : "Image not available", // Include image URL
+            batteryCapacity: finalBatteryCapacity,
         });
     } catch (error) {
         console.error(error);
@@ -75,7 +73,6 @@ app.get('/info', async (req, res) => {
     }
 });
 
-// Start the server
 app.listen(3000, () => {
     console.log('API running on port 3000');
 });
