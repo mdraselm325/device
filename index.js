@@ -52,9 +52,7 @@ app.get('/info', async (req, res) => {
         const chipsetInfo = $('td[data-spec="chipset"]').text() || "Chipset info not available";
         const batteryType = $('td[data-spec="batdescription1"]').text() || "Battery type not available";
         const batteryCapacity = $('span[data-spec="batsize-hl"]').text() || "Battery capacity not available";
-
-        const finalBatteryCapacity = batteryCapacity ? `${batteryCapacity} mAh` : "Battery capacity not available";
-        const imageUrl = $('.specs-photo-main img').attr('src'); // Get image URL
+        const imageUrl = $('.specs-photo-main img').attr('src') || "Image not available"; // Get image URL
 
         res.json({
             title,
@@ -68,7 +66,7 @@ app.get('/info', async (req, res) => {
             ramSize,
             chipsetInfo,
             batteryType,
-            batteryCapacity: finalBatteryCapacity,
+            batteryCapacity: batteryCapacity ? `${batteryCapacity} mAh` : "Battery capacity not available",
             imageUrl: imageUrl ? `https://www.gsmarena.com/${imageUrl}` : "Image not available", // Include image URL
         });
     } catch (error) {
