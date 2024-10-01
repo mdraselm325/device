@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const app = express();
 
+// Search Endpoint - Fetch devices based on search query
 app.get('/api', async (req, res) => {
     const query = req.query.query;
     const searchUrl = `https://www.gsmarena.com/results.php3?sQuickSearch=yes&sName=${encodeURIComponent(query)}`;
@@ -31,6 +32,7 @@ app.get('/api', async (req, res) => {
     }
 });
 
+// Info Endpoint - Fetch specific device details
 app.get('/info', async (req, res) => {
     const deviceUrl = req.query.url;
 
@@ -50,8 +52,9 @@ app.get('/info', async (req, res) => {
         const chipsetInfo = $('td[data-spec="chipset"]').text() || "Chipset info not available";
         const batteryType = $('td[data-spec="batdescription1"]').text() || "Battery type not available";
         const batteryCapacity = $('span[data-spec="batsize-hl"]').text() || "Battery capacity not available";
+        const imageUrl = $('.specs-photo-main img').attr('src'); // Fetch the image URL from the page
 
-        const finalBatteryCapacity = batteryCapacity ? `${batteryCapacity} mAh` : "Battery capacity not available";
+        const finalBatteryCapacity = batteryCapacity ? `${batteryCapacity} mAh` : 'Battery capacity not available';
 
         res.json({
             title,
@@ -66,6 +69,7 @@ app.get('/info', async (req, res) => {
             chipsetInfo,
             batteryType,
             batteryCapacity: finalBatteryCapacity,
+            imageUrl, // Add image URL to the response
         });
     } catch (error) {
         console.error(error);
